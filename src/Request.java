@@ -37,14 +37,55 @@ public class Request {
                 userAdd = new User(user.getNom(), user.getPrenom(), user.getEmail(), user.getMdp());
             }
             //7 Fermer la connexion à la BDD
-            stmt.close();
-            connexion.close();
+            //stmt.close();
+            //connexion.close();
 
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
         return userAdd;
     }
+
+    //Nouvelle methode requête select
+    public static User showUserByEmail(User user) {
+        User monUser = null;
+
+        try {
+            // La requête
+            String sql = "SELECT id, nom, prenom, email, mdp FROM users WHERE email = ?";
+            PreparedStatement preparedStatement = connexion.prepareStatement(sql);
+            preparedStatement.setString(1, user.getEmail());
+
+            // Exécution de la requête SELECT
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            // Vérification si un utilisateur a été trouvé
+            if (resultSet.next()) {
+                // Récupération des valeurs des colonnes
+                int id = resultSet.getInt("id");
+                String nom = resultSet.getString("nom");
+                String prenom = resultSet.getString("prenom");
+                String email = resultSet.getString("email");
+                String mdp = resultSet.getString("mdp");
+
+                // Création de l'objet User avec les valeurs récupérées
+                monUser = new User();
+                monUser.setId(id);
+                monUser.setNom(nom);
+                monUser.setPrenom(prenom);
+                monUser.setEmail(email);
+                monUser.setMdp(mdp);
+            }
+
+            // Fermeture des ressources
+            resultSet.close();
+            preparedStatement.close();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return monUser;
+    }
+
 
 
 }
