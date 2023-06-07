@@ -1,91 +1,121 @@
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+
 
 public class Request {
-    //Attribut paramètre BDD
+    //Attributs paramètres BDD
     static final String DB_URL = "jdbc:mysql://localhost/Java?serverTimezone=UTC";
     static final String USERNAME = "root";
     static final String PASSWORD = "";
     //Connexion à la BDD
     private static Connection connexion;
-    //Connexion à la BDD
-    static {
-        try {
+    static{
+        try{
             connexion = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD);
-        } catch (SQLException e) {
+        }
+        catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
-    // Methode ajouter un user
     public static User addUser(User user){
+        //instancier un Objet User null
         User userAdd = null;
-        try{
-            // 1 Connection à la BDD...
+        try {
+            //1 Connection à la BDD...
             Statement stmt = connexion.createStatement();
-            // 2 requête SQL
-            String sql = "INSERT INTO users (nom, prenom, email, mdp) " + "VALUES (?, ?, ?, ?)";
+            //2 Requête SQL
+            String sql = "INSERT INTO users (nom, prenom, email,mdp ) " + "VALUES (?, ?, ?, md5(?))";
             //3 préparer la requête
             PreparedStatement preparedStatement = connexion.prepareStatement(sql);
-            // 4 Binder les paramètres
+            //4 Bind des paramètres
             preparedStatement.setString(1, user.getNom());
             preparedStatement.setString(2, user.getPrenom());
             preparedStatement.setString(3, user.getEmail());
-            preparedStatement.setString(4, user.getMdp());
-            //5 Exécution de la requête le typage int pour savoir combien d'enregistrement
-            int addRows = preparedStatement.executeUpdate();
-            //6 Test si la requête est bien passée
-            if(addRows >0){
-                userAdd = new User(user.getNom(), user.getPrenom(), user.getEmail(), user.getMdp());
+            preparedStatement.setString(4, user.getmdp());
+            //5 Exécution de la requête
+            int addedRows = preparedStatement.executeUpdate();
+            //6 Test si la requête à été effectué
+            if(addedRows>0){
+                //assigner un user à userAdd
+                userAdd = new User(user.getNom(), user.getPrenom(), user.getEmail(), user.getmdp());
             }
             //7 Fermer la connexion à la BDD
             //stmt.close();
             //connexion.close();
-
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
         return userAdd;
     }
-
-    //Nouvelle methode requête select
-    public static User showUserByEmail(User user) {
-        User monUser = null;
-
+    public static User getUserByMail(User user){
+        //instancier un objet User null
+        User userGet = null;
         try {
-            // La requête
-            String sql = "SELECT id, nom, prenom, email, mdp FROM users WHERE email = ?";
+            //1 Connection à la BDD...
+            Statement stmt = connexion.createStatement();
+            //2 Requête SQL
+            String sql = "SELECT id,nom, prenom, email, mdp FROM users WHERE email =?";
+            //3 préparer la requête
             PreparedStatement preparedStatement = connexion.prepareStatement(sql);
+            //4 Bind des paramètres
             preparedStatement.setString(1, user.getEmail());
-
-            // Exécution de la requête SELECT
-            ResultSet resultSet = preparedStatement.executeQuery();
-
-            // Vérification si un utilisateur a été trouvé
-            if (resultSet.next()) {
-                // Récupération des valeurs des colonnes
-                int id = resultSet.getInt("id");
-                String nom = resultSet.getString("nom");
-                String prenom = resultSet.getString("prenom");
-                String email = resultSet.getString("email");
-                String mdp = resultSet.getString("mdp");
-
-                // Création de l'objet User avec les valeurs récupérées
-                monUser = new User();
-                monUser.setId(id);
-                monUser.setNom(nom);
-                monUser.setPrenom(prenom);
-                monUser.setEmail(email);
-                monUser.setMdp(mdp);
+            //5 Exécution de la requête
+            ResultSet rs = preparedStatement.executeQuery();
+            //6 Test si la requête à été effectué
+            //Parcours du résultat
+            //Si la réponse est différente de null
+            if (rs.next()){
+                if (rs.getString(1)!= null){
+                    userGet = new User();
+                    userGet.setId(Integer.parseInt(rs.getString("id")));
+                    //userGet.setId(rs.getInt("id"));
+                    userGet.setNom(rs.getString("nom"));
+                    userGet.setPrenom(rs.getString("prenom"));
+                    userGet.setEmail(rs.getString("email"));
+                    userGet.setmdp(rs.getString("mdp"));
+                }
             }
-
-            // Fermeture des ressources
-            resultSet.close();
-            preparedStatement.close();
+            //7 Fermer la connexion à la BDD
+            //stmt.close();
+            //connexion.close();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        return monUser;
+        return userGet;
     }
 
 
+    //methoe3 gett all users
+    public static List<User> getAllUsers() {
+        List<User> userList = new ArrayList<>();
+
+        try {
+            // 1. Connection à la BDD...
+            Statement stmt = connexion.createStatement();
+            // 2. Requête SQL
+            String sql = "SELECT id, nom, prenom, email, mdp FROM users";
+            // 3. Préparer la requête
+            PreparedStatement preparedStatement = connexion.prepareStatement(sql);
+            // 4. Exécution de la requête
+            ResultSet rs = preparedStatement.executeQuery();
+
+            // 5. Parcours du résultat
+            while (rs.next()) {
+                User user = new User();
+                user.setId(rs.getInt("id"));
+                user.setNom(rs.getString("nom"));
+                user.setPrenom(rs.getString("prenom"));
+                user.setEmail(rs.getString("email"));
+                user.setmdp(rs.getString("mdp"));
+
+                userList.add(user);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        return userList;
+    }
 
 }
