@@ -117,5 +117,33 @@ public class Request {
 
         return userList;
     }
+    public static User updateUserAttribute(User user, String theName, String newName) {
+        User updatedUser = null;
+        try {
+            String sql = "UPDATE users SET " + theName + " = ? WHERE id = ?";
+            PreparedStatement preparedStatement = connexion.prepareStatement(sql);
+            preparedStatement.setString(1, newName);
+            preparedStatement.setInt(2, user.getId());
+            int updatedRows = preparedStatement.executeUpdate();
+            if (updatedRows > 0) {
+                updatedUser = new User(user.getNom(), user.getPrenom(), user.getEmail(), user.getmdp());
+                updatedUser.setId(user.getId());
+                if (theName.equals("nom")) {
+                    updatedUser.setNom(newName);
+                } else if (theName.equals("prenom")) {
+                    updatedUser.setPrenom(newName);
+                } else if (theName.equals("email")) {
+                    updatedUser.setEmail(newName);
+                } else if (theName.equals("mdp")) {
+                    updatedUser.setmdp(newName);
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return updatedUser;
+    }
+
+
 
 }
