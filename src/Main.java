@@ -1,4 +1,5 @@
 import java.util.List;
+import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
@@ -37,6 +38,37 @@ public class Main {
             System.out.println("Le 'nom' a été mis à jour  avec l'ID : " + updatedUser.getId());
         } else {
             System.out.println("Impossible de mettre à jour l'attribut séléctionné " );
+        }
+
+        // Scanner début
+        Scanner scanner = new Scanner(System.in);
+
+        // Demander à l'utilisateur de saisir les informations
+        System.out.println("Entrez votre nom :");
+        String nom = scanner.nextLine();
+
+        System.out.println("Entrez votre prénom :");
+        String prenom = scanner.nextLine();
+
+        System.out.println("Entrez votre email :");
+        String email = scanner.nextLine();
+
+        System.out.println("Entrez votre mot de passe :");
+        String mdp = scanner.nextLine();
+
+        // Construire un objet User
+        User user = new User(nom, prenom, email, mdp);
+
+        // Vérifier si le compte existe déjà
+        User exist = Request.getUserByMail(user);
+
+        if (exist == null) {
+            // Le compte n'existe pas
+            User addedUser = Request.addUser(user);
+            System.out.println("Le compte a été ajouté : " + addedUser.getPrenom());
+        } else {
+            // Le compte existe déjà
+            System.out.println("Erreur : Le compte existe déjà pour l'email " + email);
         }
 
 
