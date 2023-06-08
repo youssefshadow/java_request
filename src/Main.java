@@ -4,7 +4,7 @@ public class Main {
     public static void main(String[] args) {
         //instancier un objet User
         User test = new User("Akagami", "Shanks", "shanks6@test.com", "5678");
-        User test1 = new User("Yoann", "Depp", "yoann@test1.com", "1234");
+        User test1 = new User("Yoann", "Depp", "yoann@test1.com", "51234");
         User monTest = new User("Test1", "Test1", "allo@test1.com", "1234");
         //Appel de la fonction getUserByMail
         User getUser = Request.getUserByMail(test);
@@ -36,7 +36,7 @@ public class Main {
         if (updatedUser != null) {
             System.out.println("Le 'nom' a été mis à jour  avec l'ID : " + updatedUser.getId());
         } else {
-            System.out.println("Impossible de mettre à jour l'attribut 'nom' " );
+            System.out.println("Impossible de mettre à jour l'attribut séléctionné " );
         }
 
 
