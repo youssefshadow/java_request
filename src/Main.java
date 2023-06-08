@@ -83,7 +83,7 @@ public class Main {
             System.out.println("  Prénom : " + user.getPrenom());
             System.out.println("  Email : " + user.getEmail());
             System.out.println("  Mot de passe : " + user.getmdp());
-            System.out.println("________");
+            System.out.println("**************************************************");
         }
     }
 }
